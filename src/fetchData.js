@@ -5,17 +5,22 @@ const username = "ayushrai9142"; // <-- apna GitHub username yahan likh
 
 export async function fetchGitHubData() {
   const headers = { Authorization: `token ${process.env.GH_TOKEN}` };
-const userRes = await fetch(`https://api.github.com/users/${username}`, { headers });
 
+  // 🧠 User data fetch
+  const userRes = await fetch(`https://api.github.com/users/${username}`, { headers });
   const user = await userRes.json();
 
-  const repoRes = await fetch(`https://api.github.com/users/${username}/repos?per_page=100`);
+  // 🧠 All repos fetch
+  const repoRes = await fetch(`https://api.github.com/users/${username}/repos?per_page=100`, { headers });
   const repos = await repoRes.json();
 
-  // Total commits (lifetime) from all repos
+  // 🔢 Total commits (lifetime)
   let totalCommits = 0;
   for (const repo of repos) {
-    const commitRes = await fetch(`https://api.github.com/repos/${username}/${repo.name}/commits?per_page=1`);
+    const commitRes = await fetch(
+      `https://api.github.com/repos/${username}/${repo.name}/commits?per_page=1`,
+      { headers }
+    );
     if (commitRes.ok) {
       const commits = commitRes.headers.get("link");
       if (commits && commits.includes("page=")) {
@@ -25,10 +30,11 @@ const userRes = await fetch(`https://api.github.com/users/${username}`, { header
     }
   }
 
+  // 📊 Save result
   const data = {
     public_repos: user.public_repos || 0,
     total_contributions: totalCommits,
-    active_days: Math.floor(totalCommits / 2), // rough active streak
+    active_days: Math.floor(totalCommits / 2), // estimated
   };
 
   fs.writeFileSync("data.json", JSON.stringify(data, null, 2));
