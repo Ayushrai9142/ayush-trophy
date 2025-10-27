@@ -1,54 +1,29 @@
-// src/generateTrophy.js
-function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c])); }
+import fs from "fs";
 
-export function generateSVG(data) {
-  // data fields used:
-  // followers, public_repos, total_stars, total_open_issues, recent_commits, recent_prs
-  const cards = [
-    { title: "Stars", subtitle: "Stargazer", value: `${data.total_stars}pt` },
-    { title: "Commit", subtitle: "Ultra Committer", value: `${data.recent_commits}pt` },
-    { title: "Followers", subtitle: "Dynamic User", value: `${data.followers}pt` },
-    { title: "Issues", subtitle: "High Issuer", value: `${data.total_open_issues}pt` },
-    { title: "Repositories", subtitle: "Middle Repo Creator", value: `${data.public_repos}pt` },
-    { title: "PullRequest", subtitle: "First PR", value: `${data.recent_prs}pt` }
-  ];
+const data = JSON.parse(fs.readFileSync("data.json", "utf-8"));
 
-  const cardW = 200;
-  const gap = 12;
-  const width = cards.length * (cardW + gap) + 20;
-  const height = 160;
+const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="160">
+  <rect rx="10" width="100%" height="100%" fill="#272822"/>
+  
+  <text x="50%" y="35" text-anchor="middle" font-family="Verdana" font-size="22" fill="#f92672" font-weight="700">
+    🏆 AR Trophy 🏆
+  </text>
 
-  const bg = "#2b2e31"; // dark panel bg similar to image
-  const cardBg = "#2a2d30";
-  const accent = "#f0c674";
-  const textMain = "#f6f6f6";
-  const subtitleColor = "#e07b7b";
+  <g transform="translate(40,60)">
+    <rect x="0" y="0" width="120" height="80" rx="8" fill="#1e1e1e" stroke="#f92672" stroke-width="2"/>
+    <text x="60" y="30" text-anchor="middle" font-family="Verdana" font-size="14" fill="#e6db74">🏆 Active Days</text>
+    <text x="60" y="55" text-anchor="middle" font-family="Verdana" font-size="16" fill="#a6e22e">${data.active_days}</text>
 
-  const cardsSVG = cards.map((c, i) => {
-    const x = 10 + i * (cardW + gap);
-    return `
-      <g transform="translate(${x},10)">
-        <rect width="${cardW}" height="140" rx="8" fill="${cardBg}" stroke="#cfcfcf22" stroke-width="2"/>
-        <text x="${cardW/2}" y="30" text-anchor="middle" font-family="Verdana" font-size="18" fill="${accent}" font-weight="700">${esc(c.title)}</text>
-        <!-- trophy circle/icon -->
-        <g transform="translate(${cardW/2 - 36},40)">
-          <rect x="0" y="0" width="72" height="72" rx="8" fill="#ffffff88" />
-          <text x="36" y="46" text-anchor="middle" font-family="Verdana" font-size="28" fill="#2b2e31" font-weight="700">${esc(c.title[0]||"A")}</text>
-        </g>
-        <text x="${cardW/2}" y="128" text-anchor="middle" font-family="Verdana" font-size="14" fill="${subtitleColor}" font-weight="700">${esc(c.subtitle)}</text>
-        <text x="${cardW/2}" y="148" text-anchor="middle" font-family="Verdana" font-size="12" fill="#bdbdbd">${esc(c.value)}</text>
-        <!-- progress bar -->
-        <rect x="12" y="110" width="${cardW-24}" height="6" rx="3" fill="#6b5b4a" />
-        <rect x="12" y="110" width="${Math.max(8, (cardW-24) * 0.25)}" height="6" rx="3" fill="#e7b77c" />
-      </g>
-    `;
-  }).join("\n");
+    <rect x="140" y="0" width="120" height="80" rx="8" fill="#1e1e1e" stroke="#66d9ef" stroke-width="2"/>
+    <text x="200" y="30" text-anchor="middle" font-family="Verdana" font-size="14" fill="#e6db74">🏆 Public Repos</text>
+    <text x="200" y="55" text-anchor="middle" font-family="Verdana" font-size="16" fill="#a6e22e">${data.public_repos}</text>
 
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-  <rect width="100%" height="100%" fill="${bg}" rx="10"/>
-  ${cardsSVG}
-  <!-- footer small text -->
-  <text x="${width-12}" y="${height-6}" text-anchor="end" font-family="Verdana" font-size="10" fill="#999">${esc(data.fetched_at)}</text>
+    <rect x="280" y="0" width="120" height="80" rx="8" fill="#1e1e1e" stroke="#fd971f" stroke-width="2"/>
+    <text x="340" y="30" text-anchor="middle" font-family="Verdana" font-size="14" fill="#e6db74">🏆 Contributions</text>
+    <text x="340" y="55" text-anchor="middle" font-family="Verdana" font-size="16" fill="#a6e22e">${data.total_contributions}</text>
+  </g>
 </svg>`;
-}
+
+fs.writeFileSync("trophy.svg", svg);
+console.log("🏆 Trophy SVG updated successfully!");
