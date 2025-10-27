@@ -4,7 +4,9 @@ import fs from "fs";
 const username = "ayushrai9142"; // <-- apna GitHub username yahan likh
 
 export async function fetchGitHubData() {
-  const userRes = await fetch(`https://api.github.com/users/${username}`);
+  const headers = { Authorization: `token ${process.env.GH_TOKEN}` };
+const userRes = await fetch(`https://api.github.com/users/${username}`, { headers });
+
   const user = await userRes.json();
 
   const repoRes = await fetch(`https://api.github.com/users/${username}/repos?per_page=100`);
