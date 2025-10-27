@@ -11,3 +11,5 @@ The trophy updates automatically every day using **GitHub Actions**.
 
 ### 📄 Output Preview
 ![Ayush’s Trophy](https://raw.githubusercontent.com/Ayushrai9142/ayush-trophy/main/trophy.svg)
+
+
