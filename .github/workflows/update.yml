@@ -1,36 +1,33 @@
 name: Update Trophy
-
 on:
   schedule:
-    - cron: '*/30 * * * *'   # optional: every 30 minutes (change to daily if you prefer)
+    - cron: "0 0 * * *" # Daily midnight update
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: "20"
 
-      - name: Install deps
-        run: npm install node-fetch
+      - name: Install dependencies
+        run: npm install node-fetch@2
 
-      - name: Generate trophy
-        env:
-          PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}  # optional
-        run: node index.js
-
-      - name: Commit if changed
+      - name: Fetch GitHub data and update SVG
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add trophy.svg
-          git commit -m "Auto-update trophy" || echo "No changes"
+          node src/fetchData.js
+          node src/generateSVG.js
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add trophy.svg data.json
+          git commit -m "Auto-update trophy"
           git push
