@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import fs from "fs";
 
-const username = "ayushrai9142"; // <-- apna GitHub username yahan likh
+const username = "ayushraistudio"; // <-- apna GitHub username yahan likh
 
 export async function fetchGitHubData() {
   const headers = { Authorization: `token ${process.env.GH_TOKEN}` };
